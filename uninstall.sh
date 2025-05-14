@@ -1,4 +1,4 @@
-#!/bin/bsah
+#!/bin/bash
 STATUS_OK=0
 STATUS_NOT_ROOT=1
 

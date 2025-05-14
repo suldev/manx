@@ -17,9 +17,12 @@ cp src/* $MANXLIB
 chmod 755 bin/manx
 chmod 744 bin/manx-daemon
 cp bin/* $MANXBIN
-cp blocklist.txt $MANXCFG
-cp whitelist.txt $MANXCFG
-cp -r systemd/* $SYSTEMD
+mkdir $MANXCFG
+if [[ $? == 0 ]]; then
+    cp blocklist.txt $MANXCFG
+    cp whitelist.txt $MANXCFG
+fi
+cp -r --update systemd/* $SYSTEMD
 
 systemctl daemon-reload
 systemctl enable manx.timer
