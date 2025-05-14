@@ -26,15 +26,15 @@ def main():
     
     #Read blocklist urls
     log.info("Processing lists")
-    blocklist_urls = urls.read_from_file(args.path)
+    blocklist_urls = urls.read_blocklist(args.path)
 
     #Read whitelist urls
     omit = args.W is not None
     whitelist_urls = []
     if args.w is not None:
-        whitelist_urls = urls.read_from_file(args.w)
+        whitelist_urls = urls.read_whitelist(args.w)
     elif args.W is not None:
-        whitelist_urls = urls.read_from_file(args.W)
+        whitelist_urls = urls.read_whitelist(args.W)
 
     #Read blacklist urls
     log.info("Processing blacklisted urls")

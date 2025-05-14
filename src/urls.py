@@ -28,7 +28,7 @@ def lines_to_urls(lines):
             urls.append(line.rstrip())
     return urls
 
-def read_from_file(file):
+def read_blocklist(file):
     urls = []
     iline = 0
     for line in file.readlines():
@@ -39,6 +39,14 @@ def read_from_file(file):
             urls.append(urlparse(line).geturl())
         else:
             log.warn("line " + str(iline) + ": invalid url")
+    return urls
+
+def read_whitelist(file):
+    urls = []
+    for line in file.readlines():
+        if line.startswith('#'):
+            continue
+        urls.append(urlparse(line).geturl())
     return urls
 
 def read_from_remote(remote):
