@@ -46,7 +46,7 @@ def read_whitelist(file):
     for line in file.readlines():
         if line.startswith('#'):
             continue
-        urls.append(urlparse(line).geturl())
+        urls.append(line)
     return urls
 
 def read_from_remote(remote):
@@ -62,7 +62,7 @@ def to_lines(blacklist, whitelist, omit, method):
     for url in blacklist:
         line = ''
         for wl in whitelist:
-            if url in wl:
+            if wl in url:
                 if omit:
                     continue
                 line = '#'
