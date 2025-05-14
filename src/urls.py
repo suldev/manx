@@ -15,7 +15,8 @@ def lines_to_urls(lines, simple):
         if line.startswith('#') or line.startswith('!'): 
             continue
         elif simple:
-            urls.append(line.rstrip())
+            if urlparse(line).netloc != '':
+                urls.append(urlparse(line).geturl())
         elif line.startswith(dnsmasq_2_86_prefix):
             urls.append(line[len(dnsmasq_2_86_prefix):-len(dnsmasq_postfix)])
         elif line.startswith(dnsmasq_2_85_prefix):
@@ -45,8 +46,8 @@ def to_lines(blacklist, whitelist, omit, method):
     lines = []
     for url in blacklist:
         line = ''
-        if whitelist is not None:
-            if url in whitelist:
+        for wl in whitelist:
+            if url in wl:
                 if omit:
                     continue
                 line = '#'
