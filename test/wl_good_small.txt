@@ -1,0 +1,4 @@
+# Basic whitelist
+# working
+# Purpose: test wildcard
+wayfair
