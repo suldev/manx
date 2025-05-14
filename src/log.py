@@ -1,8 +1,7 @@
 verbose = False
 
 def info(message):
-    if verbose:
-        print (f":: {message}")
+    print (f":: {message}")
 
 def warn(message):
     print (f"WW {message}")
@@ -19,4 +18,5 @@ def debugstop(message):
     quit()
 
 def debug(message):
-    print (f"DD {message}")
+    if verbose:
+        print (f"DD {message}")

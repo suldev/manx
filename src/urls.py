@@ -9,14 +9,11 @@ hosts_prefix = '0.0.0.0 '
 adblock_prefix = '||'
 adblock_postfix = '^'
 
-def lines_to_urls(lines, simple):
+def lines_to_urls(lines):
     urls = []
     for line in lines:
         if line.startswith('#') or line.startswith('!'): 
             continue
-        elif simple:
-            if urlparse(line).netloc != '':
-                urls.append(urlparse(line).geturl())
         elif line.startswith(dnsmasq_2_86_prefix):
             urls.append(line[len(dnsmasq_2_86_prefix):-len(dnsmasq_postfix)])
         elif line.startswith(dnsmasq_2_85_prefix):
@@ -32,14 +29,24 @@ def lines_to_urls(lines, simple):
     return urls
 
 def read_from_file(file):
-    return lines_to_urls(file.readlines(), True)
+    urls = []
+    iline = 0
+    for line in file.readlines():
+        iline = iline + 1
+        if line.startswith('#'):
+            continue
+        elif urlparse(line).netloc != '':
+            urls.append(urlparse(line).geturl())
+        else:
+            log.warn("line " + str(iline) + ": invalid url")
+    return urls
 
 def read_from_remote(remote):
     urls = []
     res = requests.get(remote)
     if res.status_code == 200:
         lines = res.text.split('\n')
-        urls = lines_to_urls(lines, False)
+        urls = lines_to_urls(lines)
     return urls
 
 def to_lines(blacklist, whitelist, omit, method):
