@@ -64,19 +64,20 @@ def to_lines(blacklist, whitelist, omit, method):
         for wl in whitelist:
             if wl in url:
                 if omit:
-                    continue
+                    break
                 line = '#'
-        if method == 0:
-            line += dnsmasq_2_86_prefix + url + dnsmasq_postfix
-        elif method == 1:
-            line += dnsmasq_2_85_prefix + url + dnsmasq_postfix
-        elif method == 2:
-            line += hosts_prefix + url
-        elif method == 3:
-            line += url
-        elif method == 4:
-            line += adblock_prefix + url + adblock_postfix
-        if len(line) > 1:
-            lines.append(line)
+        else:
+            if method == 0:
+                line += dnsmasq_2_86_prefix + url + dnsmasq_postfix
+            elif method == 1:
+                line += dnsmasq_2_85_prefix + url + dnsmasq_postfix
+            elif method == 2:
+                line += hosts_prefix + url
+            elif method == 3:
+                line += url
+            elif method == 4:
+                line += adblock_prefix + url + adblock_postfix
+            if len(line) > 1:
+                lines.append(line)
     return lines
         
