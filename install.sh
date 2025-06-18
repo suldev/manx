@@ -17,8 +17,8 @@ cp src/* $MANXLIB
 chmod 755 bin/manx
 chmod 744 bin/manx-daemon
 cp bin/* $MANXBIN
-mkdir $MANXCFG
-if [[ $? == 0 ]]; then
+if [ ! -d "$MANXCFG" ]; then
+    mkdir $MANXCFG 2>&1 >/dev/null
     cp blocklist.txt $MANXCFG
     cp whitelist.txt $MANXCFG
 fi
