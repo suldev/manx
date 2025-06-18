@@ -23,6 +23,8 @@ def main():
     #Parse those args
     args = parser.parse_args()
     log.verbose = args.verbose
+    if(args.syntax not in syntax):
+        log.fatal('Invalid syntax.')
     
     #Read blocklist urls
     log.info("Processing lists")
@@ -45,10 +47,7 @@ def main():
 
     #Remove whitelisted urls
     log.info("Processing output lines")
-    try:
-        out_lines = urls.to_lines(blacklist_urls, whitelist_urls, omit, syntax[args.syntax])
-    except:
-        out_lines = urls.to_lines(blacklist_urls, whitelist_urls, omit, 0)
+    out_lines = urls.to_lines(blacklist_urls, whitelist_urls, omit, syntax[args.syntax])
 
     #Write out
     log.info("Writing to disk")
