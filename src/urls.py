@@ -1,6 +1,5 @@
-import requests
 from urllib.parse import urlparse
-import log
+import requests, re, log
 
 dnsmasq_2_86_prefix = 'local=/'
 dnsmasq_2_85_prefix = 'server=/'
@@ -9,36 +8,56 @@ hosts_prefix = '0.0.0.0 '
 adblock_prefix = '||'
 adblock_postfix = '^'
 
+def is_valid_hostname(hostname):
+    if hostname[-1] == ".":
+        # strip exactly one dot from the right, if present
+        hostname = hostname[:-1]
+    if len(hostname) > 253:
+        return False
+
+    labels = hostname.split(".")
+
+    # the TLD must be not all-numeric
+    if re.match(r"[0-9]+$", labels[-1]):
+        return False
+
+    allowed = re.compile(r"(?!-)[a-z0-9-]{1,63}(?<!-)$", re.IGNORECASE)
+    return all(allowed.match(label) for label in labels)
+
 def lines_to_urls(lines):
-    urls = []
+    bad_urls = []
     for line in lines:
-        if line.startswith('#') or line.startswith('!'): 
+        if line.startswith('#') or line.startswith('!') or len(line.rstrip()) == 0:
             continue
         elif line.startswith(dnsmasq_2_86_prefix):
-            urls.append(line[len(dnsmasq_2_86_prefix):-len(dnsmasq_postfix)])
+            bad_urls.append(line[len(dnsmasq_2_86_prefix):-len(dnsmasq_postfix)])
         elif line.startswith(dnsmasq_2_85_prefix):
-            urls.append(line[len(dnsmasq_2_85_prefix):-len(dnsmasq_postfix)])
+            bad_urls.append(line[len(dnsmasq_2_85_prefix):-len(dnsmasq_postfix)])
         elif line.startswith(hosts_prefix):
-            urls.append(line[len(hosts_prefix):])
+            bad_urls.append(line[len(hosts_prefix):])
         elif line.startswith(adblock_prefix):
-            urls.append(line[len(adblock_prefix):-len(adblock_postfix)])
-        elif urlparse(line).netloc != '':
-            urls.append(urlparse(line).netloc)
-        elif urlparse(line).path != '':
-            urls.append(line.rstrip())
-    return urls
+            bad_urls.append(line[len(adblock_prefix):-len(adblock_postfix)])
+        else:
+            words = line.split(' ')
+            for word in words:
+                if len(word.rstrip()) > 0 and is_valid_hostname(word):
+                    bad_urls.append(word)
+                    break
+            else:
+                log.warn("blacklist line " + line + " was invalid")
+    return bad_urls
 
 def read_blocklist(file):
     urls = []
     iline = 0
     for line in file.readlines():
         iline = iline + 1
-        if line.startswith('#'):
+        if line.startswith('#') or len(line.rstrip()) == 0:
             continue
         elif urlparse(line).netloc != '':
             urls.append(urlparse(line).geturl())
         else:
-            log.warn("line " + str(iline) + ": invalid url")
+            log.warn("blocklist line " + str(iline) + "contains an invalid url")
     return urls
 
 def read_whitelist(file):
