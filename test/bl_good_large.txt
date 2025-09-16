@@ -5,3 +5,5 @@
 https://raw.githubusercontent.com/KnightmareVIIVIIXC/AIO-Firebog-Blocklists/main/domlists/firebogsus.txt
 https://raw.githubusercontent.com/KnightmareVIIVIIXC/AIO-Firebog-Blocklists/main/domlists/firebogtrack.txt
 https://github.com/KnightmareVIIVIIXC/AIO-Firebog-Blocklists/raw/main/domlists/firebogmal.txt
+https://v.firebog.net/hosts/Easylist.txt
+https://adaway.org/hosts.txt
