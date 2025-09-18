@@ -12,7 +12,7 @@ MANXBIN=/usr/bin/
 MANXCFG=/etc/manx/
 SYSTEMD=/etc/systemd/
 
-mkdir $MANXLIB $MANXCFG
+mkdir $MANXLIB 2>&1 >/dev/null
 cp src/* $MANXLIB
 chmod 755 bin/manx
 chmod 744 bin/manx-daemon
