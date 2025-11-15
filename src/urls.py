@@ -57,7 +57,7 @@ def read_blocklist(file):
         elif urlparse(line).netloc != '':
             urls.append(urlparse(line).geturl())
         else:
-            log.warn("blocklist line " + str(iline) + "contains an invalid url")
+            log.warn("blocklist line " + str(iline) + " contains an invalid url")
     return urls
 
 def read_whitelist(file):
@@ -74,6 +74,8 @@ def read_from_remote(remote):
     if res.status_code == 200:
         lines = res.text.split('\n')
         urls = lines_to_urls(lines)
+    else:
+        log.warn(str(res.status_code) + " " + res.reason + ": " + remote)
     return urls
 
 def to_lines(blacklist, whitelist, omit, method):

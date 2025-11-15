@@ -1,0 +1,5 @@
+# Manx Test Suite
+# Warning Blacklists
+# No size
+      
+https://raw.githubusercontent.com/KnightmareVIdIVIIXC/AIO-Firebog-Blocklists/main/domlists/firebogsus.txt
