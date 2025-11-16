@@ -3,6 +3,7 @@ import urls, out, log
 
 def main():
     syntax = {'local' : 0, 'server' : 1, 'hosts' : 2, 'domain' : 3, 'adblock' : 4}
+    defaultTimeFormat = '%Y-%m-%d %H:%M:%S'
     parser = argparse.ArgumentParser(
         prog='manx',
         description='Combines multiple blocklists into a single dnsmasq configuration file.'
@@ -10,7 +11,7 @@ def main():
     parser.add_argument('path', type=argparse.FileType('r'), metavar='FILE', help='Required. New-line delimited list of urls. Use # for comments')
     parser.add_argument('-i', '--install', default=False, action='store_true', help='Install the configuration file and restart dnsmasq. Must be run as root.')
     parser.add_argument('-o', '--output', type=argparse.FileType('w'), metavar='FILE', default='blacklist.conf', help='Output file name. Defaults to $PWD/blocklist.conf')
-    parser.add_argument('-T', default='%Y-%m-%d %H:%M:%S', metavar='FORMAT', help='Set the time stamp formatting using python standard strftime format. Default is ISO8601 format. Not used for -x')
+    parser.add_argument('-T', default=defaultTimeFormat, metavar='FORMAT', help='Set the time stamp formatting using python standard strftime format. Default is ISO8601 format. Not used for -x')
     parser.add_argument('-v', '--verbose', default=False, action='store_true', help='Print debugging information.')
     parser.add_argument('-x', '--nohead', default=False, action='store_true', help='Do not print header information (program name, version, time, etc.).')
     parser.add_argument('-s', '--syntax', default='local', metavar='KEY', help='Set the output syntax. Options are local, server, hosts, adblock, and domain.')
@@ -25,10 +26,15 @@ def main():
     log.verbose = args.verbose
     if(args.syntax not in syntax):
         log.fatal('Invalid syntax.')
+    if(args.T != defaultTimeFormat and args.nohead is True):
+        log.warn('Header is not configured to be written, ignoring -T')
     
     #Read blocklist urls
     log.info("Processing lists")
     blocklist_urls = urls.read_blocklist(args.path)
+    blacklist_urls = []
+    for url in blocklist_urls:
+        blacklist_urls += urls.read_from_remote(url.rstrip())
 
     #Read whitelist urls
     omit = args.W is not None
@@ -38,11 +44,8 @@ def main():
     elif args.W is not None:
         whitelist_urls = urls.read_whitelist(args.W)
 
-    #Read blacklist urls
+    # Process list of bad urls
     log.info("Processing blacklisted urls")
-    blacklist_urls = []
-    for url in blocklist_urls:
-        blacklist_urls += urls.read_from_remote(url.rstrip())
     blacklist_urls = sorted(set(blacklist_urls))
 
     #Remove whitelisted urls
