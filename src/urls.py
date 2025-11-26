@@ -83,7 +83,8 @@ def to_lines(blacklist, whitelist, omit, method):
     for url in blacklist:
         line = ''
         for wl in whitelist:
-            if wl in url:
+            if url == wl or url.endswith('.' + wl):
+                log.info("Whitelist item " + url + " found in blacklist")
                 if omit:
                     break
                 line = '#'
