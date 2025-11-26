@@ -1,7 +1,10 @@
 verbose = False
 
+def section(message):
+    print(f":: {message}")
+
 def info(message):
-    print (f":: {message}")
+    print (f"II {message}")
 
 def warn(message):
     print (f"WW {message}")

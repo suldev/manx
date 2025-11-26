@@ -29,7 +29,7 @@ def main():
         log.warn('Header is not configured to be written, ignoring -T')
     
     #Read blocklist urls
-    log.info("Processing lists")
+    log.section("Processing lists")
     blocklist_urls = urls.read_blocklist(args.path)
     blacklist_urls = []
     for url in blocklist_urls:
@@ -44,15 +44,15 @@ def main():
         whitelist_urls = urls.read_whitelist(args.W)
 
     # Process list of bad urls
-    log.info("Processing blacklisted urls")
+    log.section("Processing blacklisted urls")
     blacklist_urls = sorted(set(blacklist_urls))
 
     #Remove whitelisted urls
-    log.info("Processing output lines")
+    log.section("Processing output lines")
     out_lines = urls.to_lines(blacklist_urls, whitelist_urls, omit, syntax[args.syntax])
 
     #Write out
-    log.info("Writing to disk")
+    log.section("Writing to disk")
     out.to_file(out_lines, args.output, not args.nohead, args.T)
 
 if __name__ == '__main__':
