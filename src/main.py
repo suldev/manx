@@ -9,7 +9,6 @@ def main():
         description='Combines multiple blocklists into a single dnsmasq configuration file.'
     )
     parser.add_argument('path', type=argparse.FileType('r'), metavar='FILE', help='Required. New-line delimited list of urls. Use # for comments')
-    parser.add_argument('-i', '--install', default=False, action='store_true', help='Install the configuration file and restart dnsmasq. Must be run as root.')
     parser.add_argument('-o', '--output', type=argparse.FileType('w'), metavar='FILE', default='blacklist.conf', help='Output file name. Defaults to $PWD/blocklist.conf')
     parser.add_argument('-T', default=defaultTimeFormat, metavar='FORMAT', help='Set the time stamp formatting using python standard strftime format. Default is ISO8601 format. Not used for -x')
     parser.add_argument('-v', '--verbose', default=False, action='store_true', help='Print debugging information.')
@@ -55,9 +54,6 @@ def main():
     #Write out
     log.info("Writing to disk")
     out.to_file(out_lines, args.output, not args.nohead, args.T)
-    if args.install:
-        log.error("Install not yet implemented")
-        #out.install()
 
 if __name__ == '__main__':
     main()
