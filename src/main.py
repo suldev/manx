@@ -1,5 +1,6 @@
 import argparse
-import urls, out, log
+import file, lines, remote, utils
+import log
 
 def main():
     syntax = {'local' : 0, 'server' : 1, 'hosts' : 2, 'domain' : 3, 'adblock' : 4}
@@ -20,7 +21,7 @@ def main():
     wl_group.add_argument('-w', default=None, type=argparse.FileType('r'), metavar='FILE', help='Matching lines will be commented out in the output file')
     wl_group.add_argument('-W', default=None, type=argparse.FileType('r'), metavar='FILE', help='Matching lines will be omitted from the output file')
 
-    #Parse those args
+    # Parse those args
     args = parser.parse_args()
     log.verbose = args.verbose
     if(args.syntax not in syntax):
@@ -28,32 +29,34 @@ def main():
     if(args.T != defaultTimeFormat and args.nohead is True):
         log.warn('Header is not configured to be written, ignoring -T')
     
-    #Read blocklist urls
-    log.section("Pulling blocklists")
-    blocklist_urls = urls.read_blocklist(args.path)
-    blacklist_urls = []
-    for url in blocklist_urls:
-        blacklist_urls += urls.read_from_remote(url.rstrip())
-
-    #Read whitelist urls
+    # Initialize arrays
+    log.section("Initializing")
+    blocklist_urls = file.read_blocklist(args.path)
     omit = args.W is not None
     whitelist_urls = []
     if args.w is not None:
-        whitelist_urls = urls.read_whitelist(args.w)
+        whitelist_urls = file.read_whitelist(args.w)
     elif args.W is not None:
-        whitelist_urls = urls.read_whitelist(args.W)
+        whitelist_urls = file.read_whitelist(args.W)
+
+    # Read blocklist urls
+    log.section("Pulling blocklists")
+    blacklist_lines = []
+    for url in blocklist_urls:
+        blacklist_lines += remote.read(url.rstrip())
 
     # Process list of bad urls
     log.section("Processing blocklists")
+    blacklist_urls = lines.strip(blacklist_lines)
     blacklist_urls = sorted(set(blacklist_urls))
 
-    #Remove whitelisted urls
+    # Remove whitelisted urls
     log.section("Whitelisting and syntaxing")
-    out_lines = urls.to_lines(blacklist_urls, whitelist_urls, omit, syntax[args.syntax])
+    out_lines = lines.add_syntax(blacklist_urls, whitelist_urls, omit, syntax[args.syntax])
 
-    #Write out
+    # Write out
     log.section("Writing to disk")
-    out.to_file(out_lines, args.output, not args.nohead, args.T)
+    file.write(out_lines, args.output, not args.nohead, args.T)
 
 if __name__ == '__main__':
     main()
